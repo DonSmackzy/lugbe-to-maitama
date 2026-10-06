@@ -1,0 +1,32 @@
+{
+  "name": "lugbe-to-maitama",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Viral browser-based multiplayer 2D isometric socio-economic survival game set in Abuja",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:migrate": "pnpm --filter @ltm/db migrate",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "city-packs/*"
+  ],
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.2",
+    "prettier": "^3.4.2",
+    "eslint": "^9.17.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.2"
+}

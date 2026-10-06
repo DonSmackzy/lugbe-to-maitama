@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "npcs": [
+    {
+      "id": "the_president",
+      "displayName": "The President",
+      "archetype": "head_of_state",
+      "archetypeId": "head_of_state",
+      "location": "the_villa",
+      "districtId": "the_villa",
+      "position": {
+        "x": 105,
+        "y": 105
+      },
+      "dialogueTitle": "Commander-in-Chief",
+      "meta": {
+        "endGameNpc": true,
+        "satiricalRole": "The Big Oga at the Apex"
+      }
+    }
+  ]
+}

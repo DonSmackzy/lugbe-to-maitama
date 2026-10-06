@@ -1,0 +1,32 @@
+{
+  "name": "@ltm/engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure TypeScript simulation engine — zero imports from apps, DOM, window, or fs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "dev": "tsc --project tsconfig.json --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ltm/city-schema": "workspace:*",
+    "@ltm/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2",
+    "vitest": "^5.0.3"
+  }
+}

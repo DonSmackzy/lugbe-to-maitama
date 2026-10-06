@@ -1,0 +1,25 @@
+{
+  "name": "@ltm/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vite + Phaser 3 isometric game client",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ltm/protocol": "workspace:*",
+    "colyseus.js": "^0.16.22",
+    "phaser": "^3.88.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^5.0.3"
+  }
+}

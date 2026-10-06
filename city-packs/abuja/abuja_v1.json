@@ -1,0 +1,365 @@
+{
+  "schemaVersion": "1.0.0",
+  "packId": "abuja_v1",
+  "displayName": "Abuja — The Capital",
+  "gridWidth": 120,
+  "gridHeight": 120,
+  "startingCashKobo": 500000,
+  "startingSocialCapital": 10,
+  "zones": [
+    {
+      "id": "residential_south",
+      "displayName": "Low-Income Residential South",
+      "type": "residential",
+      "bounds": { "topLeft": { "x": 0, "y": 0 }, "bottomRight": { "x": 29, "y": 29 } },
+      "baseRentKobo": 80000,
+      "npcDensity": 0.7
+    },
+    {
+      "id": "market_central",
+      "displayName": "Central Open Market",
+      "type": "market",
+      "bounds": { "topLeft": { "x": 30, "y": 0 }, "bottomRight": { "x": 59, "y": 29 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.95
+    },
+    {
+      "id": "transport_hub_north",
+      "displayName": "North Bus Terminal",
+      "type": "transport_hub",
+      "bounds": { "topLeft": { "x": 60, "y": 0 }, "bottomRight": { "x": 89, "y": 29 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.85
+    },
+    {
+      "id": "industrial_east",
+      "displayName": "Industrial Zone East",
+      "type": "industrial",
+      "bounds": { "topLeft": { "x": 90, "y": 0 }, "bottomRight": { "x": 119, "y": 29 } },
+      "baseRentKobo": 150000,
+      "npcDensity": 0.4
+    },
+    {
+      "id": "commercial_midtown",
+      "displayName": "Midtown Commercial Strip",
+      "type": "commercial",
+      "bounds": { "topLeft": { "x": 0, "y": 30 }, "bottomRight": { "x": 59, "y": 59 } },
+      "baseRentKobo": 300000,
+      "npcDensity": 0.6
+    },
+    {
+      "id": "government_hill",
+      "displayName": "Government Hill",
+      "type": "government",
+      "bounds": { "topLeft": { "x": 60, "y": 30 }, "bottomRight": { "x": 89, "y": 59 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.3
+    },
+    {
+      "id": "restricted_zone",
+      "displayName": "High-Security Restricted Zone",
+      "type": "restricted",
+      "bounds": { "topLeft": { "x": 90, "y": 30 }, "bottomRight": { "x": 119, "y": 59 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.05
+    },
+    {
+      "id": "park_green",
+      "displayName": "Central Park",
+      "type": "park",
+      "bounds": { "topLeft": { "x": 0, "y": 60 }, "bottomRight": { "x": 29, "y": 89 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.2
+    },
+    {
+      "id": "residential_uptown",
+      "displayName": "Uptown Residential Estate",
+      "type": "residential",
+      "bounds": { "topLeft": { "x": 30, "y": 60 }, "bottomRight": { "x": 89, "y": 89 } },
+      "baseRentKobo": 600000,
+      "npcDensity": 0.35
+    },
+    {
+      "id": "commercial_highend",
+      "displayName": "High-End Shopping District",
+      "type": "commercial",
+      "bounds": { "topLeft": { "x": 90, "y": 60 }, "bottomRight": { "x": 119, "y": 89 } },
+      "baseRentKobo": 800000,
+      "npcDensity": 0.5
+    },
+    {
+      "id": "transport_hub_south",
+      "displayName": "South Bus Station",
+      "type": "transport_hub",
+      "bounds": { "topLeft": { "x": 0, "y": 90 }, "bottomRight": { "x": 29, "y": 119 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.9
+    },
+    {
+      "id": "market_night",
+      "displayName": "Night Market Quarter",
+      "type": "market",
+      "bounds": { "topLeft": { "x": 30, "y": 90 }, "bottomRight": { "x": 89, "y": 119 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.8
+    },
+    {
+      "id": "government_secretariat",
+      "displayName": "Federal Secretariat Complex",
+      "type": "government",
+      "bounds": { "topLeft": { "x": 90, "y": 90 }, "bottomRight": { "x": 119, "y": 119 } },
+      "baseRentKobo": 0,
+      "npcDensity": 0.25
+    }
+  ],
+  "items": [
+    {
+      "id": "suya_wrap",
+      "displayName": "Suya Wrap",
+      "category": "food",
+      "basePriceKobo": 150000,
+      "stackable": true,
+      "maxStack": 20,
+      "weightUnits": 0.3
+    },
+    {
+      "id": "jollof_rice_plate",
+      "displayName": "Jollof Rice Plate",
+      "category": "food",
+      "basePriceKobo": 200000,
+      "stackable": true,
+      "maxStack": 10,
+      "weightUnits": 0.5
+    },
+    {
+      "id": "danfo_ticket",
+      "displayName": "Danfo Bus Ticket",
+      "category": "transport",
+      "basePriceKobo": 50000,
+      "stackable": true,
+      "maxStack": 50,
+      "weightUnits": 0.01
+    },
+    {
+      "id": "okada_ride",
+      "displayName": "Okada Ride Voucher",
+      "category": "transport",
+      "basePriceKobo": 80000,
+      "stackable": true,
+      "maxStack": 20,
+      "weightUnits": 0.01
+    },
+    {
+      "id": "envelope_cash",
+      "displayName": "Envelope of Appreciation",
+      "category": "bribe",
+      "basePriceKobo": 500000,
+      "stackable": true,
+      "maxStack": 10,
+      "weightUnits": 0.05,
+      "meta": { "illegal": true, "risk_level": "medium" }
+    },
+    {
+      "id": "national_id",
+      "displayName": "National ID Card",
+      "category": "document",
+      "basePriceKobo": 0,
+      "stackable": false,
+      "weightUnits": 0.01,
+      "meta": { "obtainable_from_rule": "get_national_id" }
+    },
+    {
+      "id": "cac_certificate",
+      "displayName": "CAC Business Certificate",
+      "category": "document",
+      "basePriceKobo": 0,
+      "stackable": false,
+      "weightUnits": 0.02,
+      "meta": { "obtainable_from_rule": "register_business" }
+    },
+    {
+      "id": "tax_clearance",
+      "displayName": "Tax Clearance Certificate",
+      "category": "document",
+      "basePriceKobo": 0,
+      "stackable": false,
+      "weightUnits": 0.01,
+      "meta": { "obtainable_from_rule": "file_tax_returns" }
+    },
+    {
+      "id": "imported_phone",
+      "displayName": "Imported Smartphone",
+      "category": "luxury",
+      "basePriceKobo": 35000000,
+      "stackable": true,
+      "maxStack": 5,
+      "weightUnits": 0.2
+    },
+    {
+      "id": "generator_fuel",
+      "displayName": "Generator Fuel (10L)",
+      "category": "tool",
+      "basePriceKobo": 1200000,
+      "stackable": true,
+      "maxStack": 10,
+      "weightUnits": 8.5
+    },
+    {
+      "id": "bootleg_goods",
+      "displayName": "Bootleg Goods Bundle",
+      "category": "contraband",
+      "basePriceKobo": 800000,
+      "stackable": true,
+      "maxStack": 5,
+      "weightUnits": 3.0,
+      "meta": { "illegal": true, "risk_level": "high" }
+    },
+    {
+      "id": "agbada_fabric",
+      "displayName": "Agbada Fabric Roll",
+      "category": "luxury",
+      "basePriceKobo": 2500000,
+      "stackable": true,
+      "maxStack": 3,
+      "weightUnits": 1.5
+    },
+    {
+      "id": "vip_clearance",
+      "displayName": "Aso Villa VIP Clearance Pass",
+      "category": "document",
+      "basePriceKobo": 100000000,
+      "stackable": false,
+      "weightUnits": 0.1,
+      "meta": { "apex_access": true }
+    }
+  ],
+  "npcArchetypes": [
+    {
+      "id": "head_of_state",
+      "displayName": "The President",
+      "spawnZoneTypes": ["restricted", "government"],
+      "fallbackDialogue": [
+        "My fellow citizen, your perseverance from Lugbe to Maitama is acknowledged.",
+        "The state budget has allocated subsidies for resilience. See my Chief of Staff.",
+        "Fellow Nigerians, tough decisions today bring a prosperous tomorrow."
+      ],
+      "interactionScModifier": 500
+    },
+    {
+      "id": "street_trader",
+      "displayName": "Street Trader",
+      "spawnZoneTypes": ["market", "transport_hub", "residential"],
+      "fallbackDialogue": [
+        "Oga, buy something now! I no go reduce again.",
+        "Customer, see fine goods! Na original I dey sell.",
+        "You dey look, you no dey buy? Please na."
+      ],
+      "interactionScModifier": 2
+    },
+    {
+      "id": "danfo_driver",
+      "displayName": "Danfo Driver",
+      "spawnZoneTypes": ["transport_hub"],
+      "fallbackDialogue": [
+        "Oya enter, we dey go! No time to waste.",
+        "Pay your money first before you enter my bus.",
+        "Last chance — we dey move now!"
+      ],
+      "interactionScModifier": 1
+    },
+    {
+      "id": "civil_servant",
+      "displayName": "Civil Servant",
+      "spawnZoneTypes": ["government"],
+      "fallbackDialogue": [
+        "Your file is under review. Come back tomorrow.",
+        "The system is down. Try again Monday.",
+        "You need form GDR-7 before I can help you."
+      ],
+      "interactionScModifier": 5
+    },
+    {
+      "id": "enforcement_officer",
+      "displayName": "Enforcement Officer",
+      "spawnZoneTypes": ["commercial", "market", "transport_hub", "restricted"],
+      "fallbackDialogue": [
+        "Do you have your papers? Let me see them.",
+        "This area requires a permit. Do you have one?",
+        "Move along, nothing to see here."
+      ],
+      "interactionScModifier": -5
+    },
+    {
+      "id": "wealthy_resident",
+      "displayName": "Wealthy Resident",
+      "spawnZoneTypes": ["residential", "commercial"],
+      "fallbackDialogue": [
+        "I'm late for a meeting. Please make it quick.",
+        "Do you know who I am? I have connections.",
+        "My schedule is very busy today."
+      ],
+      "interactionScModifier": 10
+    },
+    {
+      "id": "market_woman",
+      "displayName": "Market Woman",
+      "spawnZoneTypes": ["market"],
+      "fallbackDialogue": [
+        "Oya, I go give you good price. Na my last price!",
+        "Come, come! Fresh things just arrive.",
+        "God go bless you if you buy from me today."
+      ],
+      "interactionScModifier": 3
+    }
+  ],
+  "bureaucracyRules": [
+    {
+      "id": "get_national_id",
+      "displayName": "Obtain National ID Card",
+      "requiredItemIds": [],
+      "feeKobo": 200000,
+      "processingTicks": 10,
+      "minSocialCapital": 0
+    },
+    {
+      "id": "register_business",
+      "displayName": "Register Business with CAC",
+      "requiredItemIds": ["national_id"],
+      "feeKobo": 2500000,
+      "processingTicks": 25,
+      "minSocialCapital": 0
+    },
+    {
+      "id": "file_tax_returns",
+      "displayName": "File Annual Tax Returns",
+      "requiredItemIds": ["national_id", "cac_certificate"],
+      "feeKobo": 500000,
+      "processingTicks": 15,
+      "minSocialCapital": 5
+    },
+    {
+      "id": "obtain_import_permit",
+      "displayName": "Obtain Import Permit",
+      "requiredItemIds": ["national_id", "cac_certificate", "tax_clearance"],
+      "feeKobo": 15000000,
+      "processingTicks": 50,
+      "minSocialCapital": 50
+    },
+    {
+      "id": "restricted_zone_access",
+      "displayName": "Apply for Restricted Zone Pass",
+      "requiredItemIds": ["national_id", "tax_clearance"],
+      "feeKobo": 5000000,
+      "processingTicks": 30,
+      "minSocialCapital": 100
+    },
+    {
+      "id": "uptown_residency_permit",
+      "displayName": "Uptown Estate Residency Permit",
+      "requiredItemIds": ["national_id", "cac_certificate", "tax_clearance"],
+      "feeKobo": 50000000,
+      "processingTicks": 75,
+      "minSocialCapital": 200
+    }
+  ]
+}

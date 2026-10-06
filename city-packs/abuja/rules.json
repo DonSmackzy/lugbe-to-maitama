@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "rules": [
+    {
+      "id": "commuter_tax_satellite",
+      "displayName": "The Commuter Tax",
+      "description": "Brutal rush hour traffic from satellite towns (Lugbe, Karu, Gwarinpa) saps commuter vitality every day.",
+      "trigger": "dayTick",
+      "condition": {
+        "op": "eq",
+        "left": { "path": "actor.home.district.tier" },
+        "right": { "literal": "satellite" }
+      },
+      "effects": [
+        { "kind": "ENERGY", "delta": -18 }
+      ],
+      "priority": 10
+    },
+    {
+      "id": "maitama_prestige_dividend",
+      "displayName": "Maitama Core Prestige",
+      "description": "Living in the diplomatic core maintains high social standing among Abuja high society.",
+      "trigger": "dayTick",
+      "condition": {
+        "op": "eq",
+        "left": { "path": "actor.home.district.tier" },
+        "right": { "literal": "core" }
+      },
+      "effects": [
+        { "kind": "SOCIAL_CAPITAL", "delta": 5 }
+      ],
+      "priority": 5
+    },
+    {
+      "id": "market_hustle_exhaustion",
+      "displayName": "Midtown Hustle Strain",
+      "description": "Trading in crowded midtown markets demands extra physical exertion.",
+      "trigger": "onBuy",
+      "condition": {
+        "op": "eq",
+        "left": { "path": "actor.currentDistrict.tier" },
+        "right": { "literal": "midtown" }
+      },
+      "effects": [
+        { "kind": "ENERGY", "delta": -1 }
+      ],
+      "priority": 1
+    }
+  ]
+}

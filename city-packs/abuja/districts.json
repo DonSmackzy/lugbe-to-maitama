@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "districts": [
+    {
+      "id": "lugbe",
+      "displayName": "Lugbe",
+      "tier": "satellite",
+      "zoneIds": ["residential_south"],
+      "blockedTiles": []
+    },
+    {
+      "id": "garki",
+      "displayName": "Garki",
+      "tier": "core",
+      "zoneIds": ["government_hill", "government_secretariat"],
+      "blockedTiles": [
+        { "x": 70, "y": 35 }, { "x": 70, "y": 36 }, { "x": 71, "y": 35 },
+        { "x": 71, "y": 36 }, { "x": 72, "y": 35 }, { "x": 72, "y": 36 }
+      ]
+    },
+    {
+      "id": "wuse",
+      "displayName": "Wuse",
+      "tier": "midtown",
+      "zoneIds": ["commercial_midtown"],
+      "blockedTiles": []
+    },
+    {
+      "id": "maitama",
+      "displayName": "Maitama",
+      "tier": "core",
+      "zoneIds": ["residential_uptown", "commercial_highend"],
+      "blockedTiles": []
+    },
+    {
+      "id": "karu",
+      "displayName": "Karu",
+      "tier": "satellite",
+      "zoneIds": ["transport_hub_north", "industrial_east"],
+      "blockedTiles": []
+    },
+    {
+      "id": "central_market",
+      "displayName": "Central Market Area",
+      "tier": "midtown",
+      "zoneIds": ["market_central", "market_night", "park_green"],
+      "blockedTiles": []
+    },
+    {
+      "id": "gwarinpa",
+      "displayName": "Gwarinpa",
+      "tier": "satellite",
+      "zoneIds": ["transport_hub_south"],
+      "blockedTiles": []
+    },
+    {
+      "id": "aso_rock",
+      "displayName": "Aso Rock Perimeter",
+      "tier": "restricted",
+      "zoneIds": ["restricted_zone"],
+      "blockedTiles": [
+        { "x": 90, "y": 30 }, { "x": 91, "y": 30 }, { "x": 92, "y": 30 },
+        { "x": 93, "y": 30 }, { "x": 94, "y": 30 }, { "x": 95, "y": 30 },
+        { "x": 90, "y": 31 }, { "x": 90, "y": 32 }, { "x": 90, "y": 33 },
+        { "x": 119, "y": 30 }, { "x": 119, "y": 31 }, { "x": 119, "y": 32 }
+      ]
+    },
+    {
+      "id": "the_villa",
+      "displayName": "Aso Villa",
+      "tier": "apex",
+      "zoneIds": ["presidential_sanctum"],
+      "blockedTiles": [],
+      "entryRequirements": {
+        "minSocialCapital": 50000,
+        "requiredItem": "vip_clearance",
+        "allowedAppearanceTag": "high_fashion"
+      }
+    }
+  ]
+}

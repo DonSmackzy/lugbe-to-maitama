@@ -1,0 +1,8 @@
+{
+  "name": "@ltm/abuja",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Abuja city pack for Lugbe to Maitama",
+  "main": "./abuja_v1.json",
+  "files": ["*.json"]
+}

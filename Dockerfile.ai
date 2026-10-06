@@ -1,0 +1,43 @@
+# =============================================================================
+# Dockerfile.ai — Production Container for Fastify AI Microservice
+# Multi-stage, lightweight Node 20 Alpine image
+# =============================================================================
+
+FROM node:20-alpine AS base
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.2 --activate
+
+# --- Stage 1: Builder ---
+FROM base AS builder
+WORKDIR /app
+
+# Monorepo configuration and lockfile
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.base.json ./
+COPY packages/protocol/ ./packages/protocol/
+COPY apps/ai-service/ ./apps/ai-service/
+
+# Install dependencies and build AI service
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @ltm/ai-service build
+
+# --- Stage 2: Production Runner ---
+FROM node:20-alpine AS runner
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.2 --activate
+ENV NODE_ENV=production
+
+# Copy built packages and runtime dependencies
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/protocol ./packages/protocol
+COPY --from=builder /app/apps/ai-service ./apps/ai-service
+
+WORKDIR /app/apps/ai-service
+EXPOSE 3001
+
+# Healthcheck endpoint
+HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
+
+CMD ["node", "dist/index.js"]

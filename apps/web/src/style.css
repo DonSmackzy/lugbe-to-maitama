@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  --bg-primary: #07090e;
+  --bg-surface: rgba(18, 23, 34, 0.75);
+  --bg-card: rgba(25, 32, 48, 0.6);
+  --border-glow: rgba(0, 230, 118, 0.25);
+  --border-gold: rgba(245, 197, 24, 0.3);
+  --accent-green: #00e676;
+  --accent-gold: #f5c518;
+  --accent-amber: #ff9100;
+  --text-main: #f0f4fc;
+  --text-muted: #8c9bb3;
+  --text-subtle: #57657a;
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 15% 20%, rgba(0, 230, 118, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(245, 197, 24, 0.06) 0%, transparent 45%),
+    linear-gradient(180deg, #07090e 0%, #0d121c 100%);
+}
+
+/* Glassmorphism panel */
+.glass-panel {
+  background: var(--bg-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+
+/* Animated gradient text */
+.glow-title {
+  font-family: var(--font-display);
+  background: linear-gradient(135deg, #ffffff 20%, var(--accent-gold) 60%, var(--accent-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(245, 197, 24, 0.2);
+}
+
+/* Button with micro-interactions */
+.btn-primary {
+  background: linear-gradient(135deg, #00e676 0%, #00b0ff 100%);
+  color: #07090e;
+  font-weight: 700;
+  font-family: var(--font-display);
+  padding: 14px 32px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0, 230, 118, 0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 230, 118, 0.5);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Legal Disclaimer Box */
+.disclaimer-box {
+  background: rgba(245, 197, 24, 0.04);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 16px 20px;
+  line-height: 1.55;
+  font-size: 0.88rem;
+  color: #d1d9e6;
+  position: relative;
+}
+
+.disclaimer-title {
+  color: var(--accent-gold);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
