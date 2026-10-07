@@ -7,8 +7,47 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./rules": {
+      "types": "./dist/rules/index.d.ts",
+      "import": "./dist/rules/index.js",
+      "require": "./dist/rules/index.js",
+      "default": "./dist/rules/index.js"
+    },
+    "./rules/index.js": {
+      "types": "./dist/rules/index.d.ts",
+      "import": "./dist/rules/index.js",
+      "require": "./dist/rules/index.js",
+      "default": "./dist/rules/index.js"
+    },
+    "./rules/*": {
+      "types": "./dist/rules/*.d.ts",
+      "import": "./dist/rules/*.js",
+      "require": "./dist/rules/*.js",
+      "default": "./dist/rules/*.js"
+    },
+    "./package.json": "./package.json",
+    "./dist/*": {
+      "types": "./dist/*",
+      "import": "./dist/*",
+      "require": "./dist/*",
+      "default": "./dist/*"
+    },
+    "./*.js": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.js",
+      "default": "./dist/*.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.js",
+      "default": "./dist/*.js"
     }
   },
   "scripts": {
