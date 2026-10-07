@@ -3,6 +3,8 @@
 // Prominently displays legal disclaimer, satirical context, and player onboarding.
 // =============================================================================
 
+import { getDefaultServerUrl } from "../network/ColyseusClient.js";
+
 export const LEGAL_DISCLAIMER_TEXT =
   "DISCLAIMER: Lugbe to Maitama is a work of fiction and satire. All names, characters, businesses, places, events, and incidents are either the products of the creator's imagination or used in a fictitious manner. Any resemblance to actual persons (living or dead), including the 'President' or any government officials, is purely coincidental.";
 
@@ -148,7 +150,7 @@ export function renderSplashScreen(container: HTMLElement, onLogin: LoginCallbac
           color: var(--text-subtle);
         ">
           <span>Engine: @ltm/engine (Pure TS)</span>
-          <span>Colyseus: ws://localhost:2567</span>
+          <span>Colyseus: ${getDefaultServerUrl()}</span>
         </div>
       </div>
     </div>

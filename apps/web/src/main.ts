@@ -42,8 +42,8 @@ renderSplashScreen(appContainer, async (credentials) => {
   // 2. Mount DOM-Based HUD (pointer-events: none container)
   const hud = new GameHUD(gameRoot);
 
-  // 3. Connect to Colyseus Server with verified disclaimer payload
-  const colyseusClient = new ColyseusGameClient("ws://localhost:2567");
+  // 3. Connect to Colyseus Server with verified disclaimer payload (dynamically resolved)
+  const colyseusClient = new ColyseusGameClient();
 
   try {
     await colyseusClient.connect({

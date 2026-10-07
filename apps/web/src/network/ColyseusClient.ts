@@ -35,6 +35,34 @@ export type DialogueCallback = (dialogue: {
 
 export type ErrorCallback = (err: { code: string; message: string }) => void;
 
+/**
+ * Resolves the authoritative Colyseus server URL dynamically:
+ * - Uses `VITE_COLYSEUS_WS_URL` environment variable if defined.
+ * - Detects localhost / 127.0.0.1 in browser runtime and targets local development server `ws://localhost:2567`.
+ * - Defaults to Render production endpoint `wss://ltm-game-server.onrender.com`.
+ */
+export function getDefaultServerUrl(): string {
+  const envUrl = typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_COLYSEUS_WS_URL;
+  if (envUrl) {
+    return envUrl;
+  }
+
+  if (typeof window !== "undefined" && window.location) {
+    const hostname = window.location.hostname;
+    const isLocalhost =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]" ||
+      hostname.endsWith(".local");
+
+    if (isLocalhost) {
+      return "ws://localhost:2567";
+    }
+  }
+
+  return "wss://ltm-game-server.onrender.com";
+}
+
 export class ColyseusGameClient {
   private client: Client;
   private room: Room | null = null;
@@ -44,9 +72,13 @@ export class ColyseusGameClient {
   private onDialogueListeners: DialogueCallback[] = [];
   private onErrorListeners: ErrorCallback[] = [];
 
-  constructor(serverUrl = "ws://localhost:2567") {
-    this.serverUrl = serverUrl;
+  constructor(serverUrl?: string) {
+    this.serverUrl = serverUrl || getDefaultServerUrl();
     this.client = new Client(this.serverUrl);
+  }
+
+  public getServerUrl(): string {
+    return this.serverUrl;
   }
 
   public async connect(options: ConnectOptions): Promise<Room> {
