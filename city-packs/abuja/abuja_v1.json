@@ -132,8 +132,8 @@
       "weightUnits": 0.5
     },
     {
-      "id": "danfo_ticket",
-      "displayName": "Danfo Bus Ticket",
+      "id": "along_ticket",
+      "displayName": "Along Commuter Ticket",
       "category": "transport",
       "basePriceKobo": 50000,
       "stackable": true,
@@ -257,12 +257,12 @@
       "interactionScModifier": 2
     },
     {
-      "id": "danfo_driver",
-      "displayName": "Danfo Driver",
+      "id": "along_driver",
+      "displayName": "Along Driver",
       "spawnZoneTypes": ["transport_hub"],
       "fallbackDialogue": [
-        "Oya enter, we dey go! No time to waste.",
-        "Pay your money first before you enter my bus.",
+        "Along! Along! Wuse Along! Lugbe straight!",
+        "Pay your money first before you enter my along.",
         "Last chance — we dey move now!"
       ],
       "interactionScModifier": 1

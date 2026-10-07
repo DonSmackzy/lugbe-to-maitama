@@ -33,6 +33,13 @@
       "blockedTiles": []
     },
     {
+      "id": "asokoro",
+      "displayName": "Asokoro",
+      "tier": "core",
+      "zoneIds": ["residential_uptown"],
+      "blockedTiles": []
+    },
+    {
       "id": "karu",
       "displayName": "Karu",
       "tier": "satellite",

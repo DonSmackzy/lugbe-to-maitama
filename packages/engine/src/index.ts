@@ -34,3 +34,20 @@ export { SimulationEngine } from "./simulation.js";
 export { LedgerProcessor } from "./ledger.js";
 export { MarketEngine } from "./market.js";
 export { MovementEngine } from "./movement.js";
+
+// Transit System (Along & Bolt)
+export {
+  resolveTransit,
+  calculateTransitFare,
+  isTransitAvailable,
+  BASE_TRANSIT_FARE_KOBO,
+  ALONG_FARE_MULTIPLIER,
+  BOLT_FARE_MULTIPLIER,
+  ALONG_ENERGY_DELTA,
+  BOLT_ENERGY_DELTA,
+  BOLT_HIGHBROW_SC_BONUS,
+  HIGHBROW_DISTRICT_IDS,
+  SATELLITE_DISTRICT_IDS,
+  APEX_RESTRICTED_DISTRICT_IDS,
+} from "./transit.js";
+export type { TransitAvailabilityResult } from "./transit.js";

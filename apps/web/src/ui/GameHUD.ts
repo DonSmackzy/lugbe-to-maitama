@@ -275,7 +275,20 @@ export class GameHUD {
             font-size: 0.82rem;
             cursor: pointer;
           ">
-            🚌 Commute (Danfo)
+            🚖 Commute (Along)
+          </button>
+
+          <button id="btn-action-bolt" class="hud-action-btn" style="
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+          ">
+            🚗 Ride-Hail (Bolt)
           </button>
 
           <button id="btn-action-gala" class="hud-action-btn" style="
@@ -329,6 +342,9 @@ export class GameHUD {
     // Event listeners for quick actions
     this.container.querySelector("#btn-action-commute")?.addEventListener("click", () => {
       this.onActionHandler?.("COMMUTE");
+    });
+    this.container.querySelector("#btn-action-bolt")?.addEventListener("click", () => {
+      this.onActionHandler?.("COMMUTE_BOLT");
     });
     this.container.querySelector("#btn-action-gala")?.addEventListener("click", () => {
       this.onActionHandler?.("BUY_GALA");

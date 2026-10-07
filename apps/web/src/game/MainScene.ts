@@ -532,17 +532,17 @@ export class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Spawns canonical NPCs: Danfo Driver, Civil Servant, and The President.
+   * Spawns canonical NPCs: Along Driver, Civil Servant, and The President.
    */
   private spawnNPCs(): void {
     const npcs = [
       {
         id: "alhaji_tanko",
-        name: "Alhaji Tanko (Danfo Driver)",
+        name: "Alhaji Tanko (Along Driver)",
         gridX: 14,
         gridY: 10,
         color: 0xf59e0b,
-        archetype: "driver",
+        archetype: "along_driver",
       },
       {
         id: "director_yusuf",
@@ -592,7 +592,7 @@ export class MainScene extends Phaser.Scene {
     });
 
     // Optimistic fallback display while LLM processes
-    let fallback = "Safe trip, my guy! Watch out for traffic on Airport Road.";
+    let fallback = "Along! Along! Wuse Along! Watch out for traffic on Airport Road.";
     if (archetype === "civil_servant") {
       fallback = "File 4B is pending ministerial assent. Please return on Thursday.";
     } else if (archetype === "head_of_state") {
@@ -605,8 +605,22 @@ export class MainScene extends Phaser.Scene {
   private handleHUDAction(action: string): void {
     switch (action) {
       case "COMMUTE":
-        // Move towards the expressway / commercial midtown
-        this.dispatchMove(1, 0);
+        this.colyseusClient.sendIntent({
+          type: "TRANSIT",
+          tier: "ALONG",
+          toX: 14,
+          toY: 10,
+          idemKey: `transit_along_${Date.now()}`,
+        });
+        break;
+      case "COMMUTE_BOLT":
+        this.colyseusClient.sendIntent({
+          type: "TRANSIT",
+          tier: "BOLT",
+          toX: 45,
+          toY: 75,
+          idemKey: `transit_bolt_${Date.now()}`,
+        });
         break;
       case "BUY_GALA":
         this.colyseusClient.sendIntent({

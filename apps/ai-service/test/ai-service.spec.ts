@@ -27,7 +27,7 @@ describe("Phase 4: Fastify AI Service Specifications", () => {
     });
 
     it("should allow only 1 factory execution when 50 concurrent requests miss the cache", async () => {
-      const contextHash = "hash_danfo_traffic_rush_hour_999";
+      const contextHash = "hash_along_traffic_rush_hour_999";
       let llmCallCount = 0;
 
       // Factory that simulates a 30ms LLM generation
@@ -159,10 +159,10 @@ describe("Phase 4: Fastify AI Service Specifications", () => {
       expect(prompt).toContain("No emojis");
     });
 
-    it("should include street-smart commercial instructions for 'danfo_driver'", () => {
-      const prompt = buildSystemPrompt("danfo_driver", { wealthTier: "working_class" }, "transport_hub");
+    it("should include street-smart commercial instructions for 'along_driver'", () => {
+      const prompt = buildSystemPrompt("along_driver", { wealthTier: "working_class" }, "transport_hub");
 
-      expect(prompt).toContain("Danfo");
+      expect(prompt).toContain("Along");
       expect(prompt).toContain("Airport Road");
       expect(prompt).toContain("exact 500 Naira change");
       expect(prompt).toContain("No emojis");
@@ -190,7 +190,7 @@ describe("Phase 4: Fastify AI Service Specifications", () => {
         url: "/dialogue",
         payload: {
           contextHash: "test_hash_1",
-          npcArchetype: "danfo_driver",
+          npcArchetype: "along_driver",
           fallbackLine: "Oya move.",
         },
       });
@@ -209,7 +209,7 @@ describe("Phase 4: Fastify AI Service Specifications", () => {
         },
         payload: {
           contextHash: "test_hash_1",
-          npcArchetype: "danfo_driver",
+          npcArchetype: "along_driver",
           fallbackLine: "Oya move.",
         },
       });
@@ -228,7 +228,7 @@ describe("Phase 4: Fastify AI Service Specifications", () => {
         },
         payload: {
           contextHash: "test_hash_auth_valid",
-          npcArchetype: "danfo_driver",
+          npcArchetype: "along_driver",
           fallbackLine,
           bucketedStats: {
             wealthTier: "working_class",

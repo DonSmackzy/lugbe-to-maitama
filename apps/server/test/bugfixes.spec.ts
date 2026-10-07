@@ -47,7 +47,7 @@ describe("Architectural Audit Vulnerability Fixes", () => {
     socialCapital: 100,
     energy: 80,
     home: { districtId: "lugbe" },
-    inventory: new Map([["danfo_ticket", 1]]),
+    inventory: new Map([["along_ticket", 1]]),
     pendingFiles: new Map(),
     processedIdemKeys: new Set(),
   };
@@ -191,7 +191,7 @@ describe("Architectural Audit Vulnerability Fixes", () => {
 
       const consumeItemEffect: InventoryEffect = {
         kind: "INVENTORY",
-        itemId: "danfo_ticket",
+        itemId: "along_ticket",
         delta: -1, // Player uses up the ticket
       };
 

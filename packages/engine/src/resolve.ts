@@ -9,6 +9,7 @@ import type { ActorState, WorldState } from "./state.js";
 import type { Effect, CashEffect, InventoryEffect, PositionEffect, SocialCapitalEffect, BureaucracyFileEffect } from "./effects.js";
 import { hasError } from "./effects.js";
 import { evaluateRules } from "./rules/evaluator.js";
+import { resolveTransit } from "./transit.js";
 
 export type ExtendedClientIntent = ClientIntent & {
   idemKey?: string;
@@ -50,6 +51,8 @@ export function resolve(
       return resolveSubmitDocument(world, actor, intent, effectiveIdemKey);
     case "PAY_BRIBE":
       return resolvePayBribe(world, actor, intent, effectiveIdemKey);
+    case "TRANSIT":
+      return resolveTransit(world, actor, intent, effectiveIdemKey);
     default:
       return [
         {

@@ -46,13 +46,24 @@ export type PayBribeIntent = {
   amountKobo: number;
 };
 
+export type TransitTier = "ALONG" | "BOLT";
+
+export type TransitIntent = {
+  type: "TRANSIT";
+  tier: TransitTier;
+  toX: number;
+  toY: number;
+  toDistrictId?: string;
+};
+
 export type ClientIntent =
   | MoveIntent
   | BuyIntent
   | SellIntent
   | TalkIntent
   | SubmitDocumentIntent
-  | PayBribeIntent;
+  | PayBribeIntent
+  | TransitIntent;
 
 // ---------------------------------------------------------------------------
 // Server → Client messages
@@ -77,6 +88,7 @@ export type ErrorCode =
   | "INVALID_MOVE"
   | "BUREAUCRACY_REQUIREMENTS_UNMET"
   | "RATE_LIMITED"
+  | "TRANSIT_UNAVAILABLE"
   | "INTERNAL_ERROR";
 
 export type NpcDialogueMessage = {

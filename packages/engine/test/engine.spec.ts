@@ -48,6 +48,30 @@ const mockZones: Zone[] = [
     baseRentKobo: 200000,
     npcDensity: 0.5,
   },
+  {
+    id: "residential_uptown",
+    displayName: "Maitama Heights",
+    type: "residential",
+    bounds: { topLeft: { x: 90, y: 0 }, bottomRight: { x: 119, y: 29 } },
+    baseRentKobo: 600000,
+    npcDensity: 0.3,
+  },
+  {
+    id: "diplomatic_zone",
+    displayName: "Asokoro Diplomatic Precinct",
+    type: "residential",
+    bounds: { topLeft: { x: 90, y: 30 }, bottomRight: { x: 119, y: 59 } },
+    baseRentKobo: 800000,
+    npcDensity: 0.2,
+  },
+  {
+    id: "presidential_sanctum",
+    displayName: "Presidential Sanctum",
+    type: "restricted",
+    bounds: { topLeft: { x: 90, y: 60 }, bottomRight: { x: 119, y: 89 } },
+    baseRentKobo: 0,
+    npcDensity: 0.1,
+  },
 ];
 
 const mockDistricts: District[] = [
@@ -76,8 +100,26 @@ const mockDistricts: District[] = [
     id: "maitama",
     displayName: "Maitama",
     tier: "core",
-    zoneIds: [],
+    zoneIds: ["residential_uptown"],
     blockedTiles: [],
+  },
+  {
+    id: "asokoro",
+    displayName: "Asokoro",
+    tier: "core",
+    zoneIds: ["diplomatic_zone"],
+    blockedTiles: [],
+  },
+  {
+    id: "the_villa",
+    displayName: "Aso Villa",
+    tier: "apex",
+    zoneIds: ["presidential_sanctum"],
+    blockedTiles: [],
+    entryRequirements: {
+      minSocialCapital: 50000,
+      requiredItem: "vip_clearance",
+    },
   },
 ];
 
@@ -102,8 +144,8 @@ const mockItems: Item[] = [
 
 const mockArchetypes: NpcArchetype[] = [
   {
-    id: "danfo_driver",
-    displayName: "Danfo Driver",
+    id: "along_driver",
+    displayName: "Along Driver",
     spawnZoneTypes: ["transport_hub"],
     fallbackDialogue: ["Lugbe straight! Enter with your exact 500 Naira change!"],
     interactionScModifier: 2,
@@ -488,14 +530,14 @@ describe("Lugbe to Maitama — Engine Core Specifications", () => {
       actor.socialCapital = 15; // 0..50 -> unknown_commuter
       world.actors.set(actor.id, actor);
 
-      world.npcs.set("danfo_driver_1", {
-        instanceId: "danfo_driver_1",
-        archetypeId: "danfo_driver",
+      world.npcs.set("along_driver_1", {
+        instanceId: "along_driver_1",
+        archetypeId: "along_driver",
         position: { x: 6, y: 5 },
         lastInteractionTick: 0,
       });
 
-      const ctx = npcContext(world, actor, "danfo_driver_1");
+      const ctx = npcContext(world, actor, "along_driver_1");
       expect(ctx).not.toBeNull();
       if (!ctx) return;
 
@@ -509,7 +551,7 @@ describe("Lugbe to Maitama — Engine Core Specifications", () => {
       expect(ctx.contextHash.length).toBeGreaterThan(0);
 
       // Verify deterministic hash consistency
-      const ctx2 = npcContext(world, actor, "danfo_driver_1");
+      const ctx2 = npcContext(world, actor, "along_driver_1");
       expect(ctx2?.contextHash).toBe(ctx.contextHash);
     });
 
@@ -525,6 +567,225 @@ describe("Lugbe to Maitama — Engine Core Specifications", () => {
       expect(getReputationTier(100)).toBe("street_smart");
       expect(getReputationTier(500)).toBe("connected");
       expect(getReputationTier(5000)).toBe("godfather_tier");
+    });
+  });
+
+  // =========================================================================
+  // Spec 7: Dual-Tier Transit Engine (Along vs Bolt)
+  // =========================================================================
+  describe("Spec 7: Dual-Tier Transit Engine (Along vs Bolt)", () => {
+    it("should allow Along commuter transit in satellite/midtown hubs with standard fare and fatigue penalty", () => {
+      const actor = createTestActor("commuter_along_1", 200000); // ₦2,000
+      actor.energy = 50;
+      actor.position = { x: 5, y: 5 }; // Lugbe
+      world.actors.set(actor.id, actor);
+
+      // Commute from Lugbe (x:5, y:5) to Central Market (x:35, y:15)
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "ALONG",
+          toX: 35,
+          toY: 15,
+        },
+        "tx_along_market_1"
+      );
+
+      // Should succeed: CASH (-₦500), POSITION (35, 15), ENERGY (-8 fatigue)
+      const cash = effects.find((e) => e.kind === "CASH") as any;
+      const pos = effects.find((e) => e.kind === "POSITION") as any;
+      const energy = effects.find((e) => e.kind === "ENERGY") as any;
+
+      expect(cash).toBeDefined();
+      expect(cash.deltaKobo).toBe(-50000); // Standard fare 50,000 kobo (₦500)
+      expect(cash.ledgerKind).toBe("PURCHASE");
+      expect(cash.relatedEntityId).toBe("transit_along");
+
+      expect(pos).toBeDefined();
+      expect(pos.toX).toBe(35);
+      expect(pos.toY).toBe(15);
+
+      expect(energy).toBeDefined();
+      expect(energy.delta).toBe(-8); // Fatigue penalty for commuter travel
+
+      // Apply effects to actor and verify state mutation
+      const applied = applyEffects(actor, effects);
+      expect(applied).toBe(true);
+      expect(actor.balanceKobo).toBe(150000); // 200,000 - 50,000
+      expect(actor.energy).toBe(42); // 50 - 8
+      expect(actor.position).toEqual({ x: 35, y: 15 });
+    });
+
+    it("should reject Along direct drop-offs into highbrow residential zones like Maitama", () => {
+      const actor = createTestActor("commuter_along_maitama", 500000);
+      actor.position = { x: 5, y: 5 }; // Lugbe
+      world.actors.set(actor.id, actor);
+
+      // Attempt to take Along directly into Maitama (x: 100, y: 10)
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "ALONG",
+          toX: 100,
+          toY: 10,
+        },
+        "tx_along_maitama_reject"
+      );
+
+      expect(effects).toHaveLength(1);
+      expect(effects[0].kind).toBe("ERROR");
+      expect((effects[0] as any).code).toBe("TRANSIT_UNAVAILABLE");
+      expect((effects[0] as any).message).toContain("highbrow residential estates");
+
+      // Verify state was not modified
+      expect(applyEffects(actor, effects)).toBe(false);
+      expect(actor.position).toEqual({ x: 5, y: 5 });
+    });
+
+    it("should reject Along commercial transit into restricted presidential apex zones", () => {
+      const actor = createTestActor("commuter_along_villa", 500000);
+      actor.position = { x: 5, y: 5 };
+      world.actors.set(actor.id, actor);
+
+      // Attempt to take Along into The Villa (x: 100, y: 70)
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "ALONG",
+          toX: 100,
+          toY: 70,
+        },
+        "tx_along_villa_reject"
+      );
+
+      expect(effects).toHaveLength(1);
+      expect(effects[0].kind).toBe("ERROR");
+      expect((effects[0] as any).code).toBe("TRANSIT_UNAVAILABLE");
+      expect((effects[0] as any).message).toContain("strictly prohibited from entering restricted diplomatic");
+    });
+
+    it("should process Bolt premium ride-hailing to Maitama with higher fare multiplier and social capital boost", () => {
+      const actor = createTestActor("commuter_bolt_1", 2000000); // ₦20,000
+      actor.energy = 80;
+      actor.socialCapital = 50;
+      actor.position = { x: 5, y: 5 }; // Lugbe
+      world.actors.set(actor.id, actor);
+
+      // Ride-hail Bolt from Lugbe to Maitama (x: 100, y: 10)
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "BOLT",
+          toX: 100,
+          toY: 10,
+        },
+        "tx_bolt_maitama_1"
+      );
+
+      const cash = effects.find((e) => e.kind === "CASH") as any;
+      const pos = effects.find((e) => e.kind === "POSITION") as any;
+      const sc = effects.find((e) => e.kind === "SOCIAL_CAPITAL") as any;
+      const energy = effects.find((e) => e.kind === "ENERGY") as any;
+
+      expect(cash).toBeDefined();
+      // Bolt fare has significantly higher multiplier (>= 300,000 kobo / ₦3,000 vs 50,000 Along)
+      expect(Math.abs(cash.deltaKobo)).toBeGreaterThanOrEqual(300000);
+      expect(cash.ledgerKind).toBe("PURCHASE");
+      expect(cash.relatedEntityId).toBe("transit_bolt");
+
+      expect(pos).toBeDefined();
+      expect(pos.toX).toBe(100);
+      expect(pos.toY).toBe(10);
+
+      // Zero energy loss (air-conditioned comfort)
+      expect(energy).toBeUndefined();
+
+      // Arriving in style in highbrow Maitama grants social capital bonus
+      expect(sc).toBeDefined();
+      expect(sc.delta).toBe(2);
+
+      const applied = applyEffects(actor, effects);
+      expect(applied).toBe(true);
+      expect(actor.socialCapital).toBe(52);
+      expect(actor.position).toEqual({ x: 100, y: 10 });
+    });
+
+    it("should restrict Bolt for local intra-satellite rides (Lugbe -> Lugbe) for non-elite commuters", () => {
+      const actor = createTestActor("commuter_satellite_local", 1000000);
+      actor.socialCapital = 20; // Ordinary commuter (< 100)
+      actor.position = { x: 5, y: 5 }; // Lugbe
+      world.actors.set(actor.id, actor);
+
+      // Request Bolt within Lugbe (x: 15, y: 15)
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "BOLT",
+          toX: 15,
+          toY: 15,
+        },
+        "tx_bolt_local_reject"
+      );
+
+      expect(effects).toHaveLength(1);
+      expect(effects[0].kind).toBe("ERROR");
+      expect((effects[0] as any).code).toBe("TRANSIT_UNAVAILABLE");
+      expect((effects[0] as any).message).toContain("Bolt ride-hailing is unavailable for local commuter hops within satellite hubs like Lugbe");
+    });
+
+    it("should allow Bolt for high-social-capital players even within satellite hubs", () => {
+      const actor = createTestActor("commuter_satellite_vip", 1000000);
+      actor.socialCapital = 150; // VIP (>= 100)
+      actor.position = { x: 5, y: 5 };
+      world.actors.set(actor.id, actor);
+
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "BOLT",
+          toX: 10,
+          toY: 10,
+        },
+        "tx_bolt_local_vip"
+      );
+
+      const cash = effects.find((e) => e.kind === "CASH") as any;
+      expect(cash).toBeDefined();
+      expect(cash.deltaKobo).toBe(-300000); // Exact 6.0x multiplier (₦3,000)
+    });
+
+    it("should reject Bolt transit if player has insufficient funds", () => {
+      const actor = createTestActor("commuter_poor", 100000); // ₦1,000 (Bolt is ₦3,000+)
+      actor.position = { x: 5, y: 5 };
+      world.actors.set(actor.id, actor);
+
+      const effects = resolve(
+        world,
+        actor,
+        {
+          type: "TRANSIT",
+          tier: "BOLT",
+          toX: 100,
+          toY: 10, // Maitama
+        },
+        "tx_bolt_insufficient"
+      );
+
+      expect(effects).toHaveLength(1);
+      expect(effects[0].kind).toBe("ERROR");
+      expect((effects[0] as any).code).toBe("INSUFFICIENT_FUNDS");
     });
   });
 });
