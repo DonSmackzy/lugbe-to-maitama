@@ -317,14 +317,14 @@ export class WorldRoom extends Room<{ state: WorldRoomState }> {
   }
 
   private async persistSnapshot(): Promise<void> {
-    const actorsData = Array.from(this.world.actors.values()).map((a) => ({
+    const actorsData: RoomSnapshot["actors"] = Array.from(this.world.actors.values()).map((a) => ({
       id: a.id,
       accountId: a.accountId,
       balanceKobo: a.balanceKobo,
       socialCapital: a.socialCapital,
       energy: a.energy,
       position: a.position,
-      inventory: Array.from(a.inventory.entries()),
+      inventory: Array.from(a.inventory.entries()) as [string, number][],
     }));
 
     const snapshot: RoomSnapshot = {
