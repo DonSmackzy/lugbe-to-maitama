@@ -4,6 +4,7 @@
 // =============================================================================
 
 import { Server } from "@colyseus/core";
+import { WebSocketTransport } from "@colyseus/ws-transport";
 import { RedisPresence } from "@colyseus/redis-presence";
 import express from "express";
 import { WorldRoom } from "./rooms/WorldRoom.js";
@@ -33,6 +34,7 @@ try {
 }
 
 const gameServer = new Server({
+  transport: new WebSocketTransport(),
   ...(presence ? { presence } : {}),
   express: (serverApp) => {
     serverApp.use(app);

@@ -17,6 +17,7 @@
     "@colyseus/monitor": "^0.18.6",
     "@colyseus/redis-presence": "^0.18.5",
     "@colyseus/schema": "^5.0.36",
+    "@colyseus/ws-transport": "^0.18.4",
     "@ltm/city-schema": "workspace:*",
     "@ltm/db": "workspace:*",
     "@ltm/engine": "workspace:*",
