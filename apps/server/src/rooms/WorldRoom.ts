@@ -284,6 +284,10 @@ export class WorldRoom extends Room<{ state: WorldRoomState }> {
         type: intent.type,
         x: actor.position.x,
         y: actor.position.y,
+        lat: posEffect?.lat,
+        lng: posEffect?.lng,
+        pathWaypoints: posEffect?.pathWaypoints,
+        transitTier: posEffect?.transitTier,
         balanceKobo: actor.balanceKobo,
         effects,
       });

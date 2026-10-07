@@ -47,12 +47,24 @@ export type EnergyEffect = {
   delta: number; // signed; engine clamps to [0, 100]
 };
 
-/** Successful movement to a new grid tile. */
+/** Successful movement to a new grid tile or along a spatial road route. */
 export type PositionEffect = {
   kind: "POSITION";
   toX: number;
   toY: number;
   enteredZoneId: string | null;
+  lat?: number;
+  lng?: number;
+  pathWaypoints?: Array<{
+    x: number;
+    y: number;
+    lat?: number;
+    lng?: number;
+    speed?: number;
+    roadCategory?: string;
+  }>;
+  transitTier?: "ALONG" | "BOLT";
+  roadSegmentId?: string;
 };
 
 /** A bureaucracy file has been opened. */

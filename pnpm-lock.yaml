@@ -112,6 +112,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@ltm/city-schema':
+        specifier: workspace:*
+        version: link:../../packages/city-schema
+      '@ltm/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
       '@ltm/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol

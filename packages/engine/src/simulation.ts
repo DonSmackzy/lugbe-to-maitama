@@ -24,7 +24,23 @@ export type IntentResult =
   | { ok: false; code: string; message: string };
 
 export type StateMutation =
-  | { kind: "PLAYER_MOVED"; playerId: string; toX: number; toY: number }
+  | {
+      kind: "PLAYER_MOVED";
+      playerId: string;
+      toX: number;
+      toY: number;
+      lat?: number;
+      lng?: number;
+      pathWaypoints?: Array<{
+        x: number;
+        y: number;
+        lat?: number;
+        lng?: number;
+        speed?: number;
+        roadCategory?: string;
+      }>;
+      transitTier?: "ALONG" | "BOLT";
+    }
   | { kind: "INVENTORY_CHANGED"; playerId: string; itemId: string; delta: number }
   | { kind: "LEDGER_ENTRY"; entry: import("@ltm/protocol").LedgerEntryRecord }
   | { kind: "SOCIAL_CAPITAL_CHANGED"; playerId: string; delta: number }
@@ -229,9 +245,25 @@ export class SimulationEngine {
       }
     }
 
+    const roadPath = state.navGrid.findRoadPath(
+      player.position,
+      { x: intent.toX, y: intent.toY },
+      { transitTier: intent.tier }
+    );
+    const destGeo = state.navGrid.gridToGeo({ x: intent.toX, y: intent.toY });
+
     const mutations: StateMutation[] = [
       { kind: "LEDGER_ENTRY", entry: ledgerResult.entry },
-      { kind: "PLAYER_MOVED", playerId: player.playerId, toX: intent.toX, toY: intent.toY },
+      {
+        kind: "PLAYER_MOVED",
+        playerId: player.playerId,
+        toX: intent.toX,
+        toY: intent.toY,
+        lat: destGeo.lat,
+        lng: destGeo.lng,
+        pathWaypoints: roadPath?.waypoints,
+        transitTier: intent.tier,
+      },
     ];
 
     if (energyDelta !== 0) {

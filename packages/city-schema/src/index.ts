@@ -147,7 +147,60 @@ export const CityPackSchema = z.object({
 export type CityPack = z.infer<typeof CityPackSchema>;
 
 // ---------------------------------------------------------------------------
-// Validation helper
+// GIS & Cultural POI Overlays
+// ---------------------------------------------------------------------------
+
+/** Real-world WGS84 geographic coordinate */
+export const GeoCoordSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+});
+export type GeoCoord = z.infer<typeof GeoCoordSchema>;
+
+export const CulturePOICategorySchema = z.enum([
+  "food_and_nightlife",
+  "transit_hub",
+  "commercial_strip",
+  "financial_blackmarket",
+  "cultural_landmark",
+]);
+export type CulturePOICategory = z.infer<typeof CulturePOICategorySchema>;
+
+export const CulturePerkSchema = z.object({
+  type: z.string().min(1),
+  description: z.string().min(1),
+  energyDelta: z.number().optional(),
+  socialCapitalDelta: z.number().optional(),
+  cashMultiplier: z.number().optional(),
+  fareDiscountMultiplier: z.number().optional(),
+});
+export type CulturePerk = z.infer<typeof CulturePerkSchema>;
+
+export const CulturePOISchema = z.object({
+  id: z.string().regex(/^[a-z0-9_]+$/, "POI id must be snake_case"),
+  displayName: z.string().min(1).max(128),
+  category: CulturePOICategorySchema,
+  geo: GeoCoordSchema,
+  gridCoord: CoordSchema.optional(),
+  districtId: z.string().optional(),
+  description: z.string().min(1),
+  culturalPerk: CulturePerkSchema.optional(),
+  tags: z.array(z.string()).default([]),
+  meta: z.record(z.string(), z.unknown()).optional(),
+});
+export type CulturePOI = z.infer<typeof CulturePOISchema>;
+
+export const CultureOverlaySchema = z.object({
+  schemaVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+  cityId: z.string().min(1),
+  displayName: z.string().min(1),
+  pois: z.array(CulturePOISchema).min(1),
+  meta: z.record(z.string(), z.unknown()).optional(),
+});
+export type CultureOverlay = z.infer<typeof CultureOverlaySchema>;
+
+// ---------------------------------------------------------------------------
+// Validation helpers
 // ---------------------------------------------------------------------------
 
 /**
@@ -156,4 +209,11 @@ export type CityPack = z.infer<typeof CityPackSchema>;
  */
 export function parseCityPack(raw: unknown): CityPack {
   return CityPackSchema.parse(raw);
+}
+
+/**
+ * Parse and validate a raw JSON object as a CultureOverlay.
+ */
+export function parseCultureOverlay(raw: unknown): CultureOverlay {
+  return CultureOverlaySchema.parse(raw);
 }

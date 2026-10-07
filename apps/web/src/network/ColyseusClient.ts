@@ -22,8 +22,12 @@ export type AckCallback = (ack: {
   type: string;
   x?: number;
   y?: number;
+  lat?: number;
+  lng?: number;
   balanceKobo: number;
   effects: any[];
+  pathWaypoints?: any[];
+  transitTier?: string;
 }) => void;
 
 export type DialogueCallback = (dialogue: {

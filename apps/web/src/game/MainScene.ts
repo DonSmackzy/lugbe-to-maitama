@@ -17,6 +17,8 @@ import {
   TILE_HEIGHT,
 } from "./IsometricMath.js";
 import { PredictionManager, type MoveIntentPayload } from "./PredictionManager.js";
+import { GeoJsonMapRenderer } from "./GeoJsonMapRenderer.js";
+import type { CulturePOI } from "@ltm/city-schema";
 import type { ColyseusGameClient } from "../network/ColyseusClient.js";
 import type { GameHUD } from "../ui/GameHUD.js";
 
@@ -49,6 +51,7 @@ export class MainScene extends Phaser.Scene {
   private otherPlayerSprites: Map<string, Phaser.GameObjects.Container> = new Map();
   private npcSprites: Map<string, Phaser.GameObjects.Container> = new Map();
   private landmarkSprites: Phaser.GameObjects.Container[] = [];
+  private geoMapRenderer!: GeoJsonMapRenderer;
 
   // Input keys
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -115,10 +118,16 @@ export class MainScene extends Phaser.Scene {
       console.warn("[scene] Tilemap load fallback active:", e);
     }
 
-    // 2. Spawn Landmark Structures with Strict Y-Sorting
+    // 2. Spawn Real-World GIS GeoJSON Map (Roads, Jabi Lake, Roundabouts, Cultural POIs)
+    this.geoMapRenderer = new GeoJsonMapRenderer({
+      scene: this,
+      onPOIClick: (poi) => this.handlePOIClick(poi),
+    });
+
+    // 3. Spawn Landmark Structures with Strict Y-Sorting
     this.spawnLandmarks();
 
-    // 3. Spawn NPCs
+    // 4. Spawn NPCs
     this.spawnNPCs();
 
     // 4. Create Local Player Avatar Container
@@ -186,6 +195,14 @@ export class MainScene extends Phaser.Scene {
         this.playerSprite.setPosition(scr.x, scr.y);
         this.playerSprite.setDepth(
           calculateDepth(reconciled.x, reconciled.y, 0.5)
+        );
+      }
+
+      // Animate Along / Bolt transit vehicle along real road curvature
+      if (ack.pathWaypoints && ack.pathWaypoints.length > 1) {
+        this.geoMapRenderer.animateTransitVehicle(
+          ack.pathWaypoints as any,
+          (ack.transitTier as "ALONG" | "BOLT") ?? "ALONG"
         );
       }
 
@@ -608,8 +625,8 @@ export class MainScene extends Phaser.Scene {
         this.colyseusClient.sendIntent({
           type: "TRANSIT",
           tier: "ALONG",
-          toX: 14,
-          toY: 10,
+          toX: 73,
+          toY: 50, // Berger Underbridge (Along Park)
           idemKey: `transit_along_${Date.now()}`,
         });
         break;
@@ -617,8 +634,8 @@ export class MainScene extends Phaser.Scene {
         this.colyseusClient.sendIntent({
           type: "TRANSIT",
           tier: "BOLT",
-          toX: 45,
-          toY: 75,
+          toX: 80,
+          toY: 46, // Zone 4 BDC Hub / Wuse
           idemKey: `transit_bolt_${Date.now()}`,
         });
         break;
@@ -659,6 +676,15 @@ export class MainScene extends Phaser.Scene {
     if (x < 30 && y < 30) return "lugbe";
     if (y >= 90 && x < 60) return "karu";
     return "central_market";
+  }
+
+  private handlePOIClick(poi: CulturePOI): void {
+    const perk = poi.culturalPerk ? `\n[Cultural Perk]: ${poi.culturalPerk.description}` : "";
+    this.hud.showDialogue(
+      poi.displayName,
+      poi.category,
+      `${poi.description}${perk}`
+    );
   }
 
   private createProceduralTextures(): void {

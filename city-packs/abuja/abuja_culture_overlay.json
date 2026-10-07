@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0.0",
+  "cityId": "abuja_v1",
+  "displayName": "Abuja Cultural Joints & Street POI Overlay",
+  "pois": [
+    {
+      "id": "area_1_suya_spot",
+      "displayName": "Area 1 Suya Spot",
+      "category": "food_and_nightlife",
+      "geo": {
+        "lat": 9.0265,
+        "lng": 7.4720
+      },
+      "gridCoord": {
+        "x": 75,
+        "y": 70
+      },
+      "districtId": "garki",
+      "description": "Legendary nocturnal open-flame suya and masa joint opposite Area 1 shopping complex. Hot roasted beef coated in yaji pepper, served with onions and fresh cabbage. Essential energy pitstop for commuters.",
+      "culturalPerk": {
+        "type": "SUYA_ENERGY_RESTORE",
+        "description": "Replenishes +35 energy instantly; grants local street intelligence on military checkpoints.",
+        "energyDelta": 35,
+        "socialCapitalDelta": 5
+      },
+      "tags": ["suya", "nightlife", "masa", "yaji", "garki", "food"]
+    },
+    {
+      "id": "berger_underbridge",
+      "displayName": "Berger Underbridge (Along Park)",
+      "category": "transit_hub",
+      "geo": {
+        "lat": 9.0620,
+        "lng": 7.4680
+      },
+      "gridCoord": {
+        "x": 73,
+        "y": 50
+      },
+      "districtId": "wuse",
+      "description": "The beating heart of Abuja commuter hustle. Dozens of Along drivers shouting 'Along! Along! Wuse! Airport Road!' Agberos collecting ticket levies while fast green-and-white cabs load passengers on the fly.",
+      "culturalPerk": {
+        "type": "ALONG_TRANSIT_DISCOUNT",
+        "description": "Reduces Along transit fares by 25%; fastest route connection to Lugbe satellite corridor.",
+        "fareDiscountMultiplier": 0.75,
+        "energyDelta": -5
+      },
+      "tags": ["along", "transit", "roundabout", "agbero", "wuse", "lugbe_link"]
+    },
+    {
+      "id": "gwarinpa_3rd_avenue",
+      "displayName": "Gwarinpa 3rd Avenue",
+      "category": "commercial_strip",
+      "geo": {
+        "lat": 9.1080,
+        "lng": 7.4120
+      },
+      "gridCoord": {
+        "x": 41,
+        "y": 24
+      },
+      "districtId": "gwarinpa",
+      "description": "The liveliest social artery in West Africa's largest planned housing estate. Lined with Lebanese shawarma spots, rooftop lounges, boutique pharmacies, and neon-lit barbecue joints.",
+      "culturalPerk": {
+        "type": "ESTATE_SOCIAL_NETWORK",
+        "description": "Social capital boost (+20 SC) from networking with middle-class entrepreneurs and tech freelancers.",
+        "socialCapitalDelta": 20,
+        "energyDelta": 15
+      },
+      "tags": ["gwarinpa", "nightlife", "shawarma", "boulevard", "lounges"]
+    },
+    {
+      "id": "zone_4_bdc_hub",
+      "displayName": "Zone 4 BDC Hub",
+      "category": "financial_blackmarket",
+      "geo": {
+        "lat": 9.0680,
+        "lng": 7.4810
+      },
+      "gridCoord": {
+        "x": 80,
+        "y": 46
+      },
+      "districtId": "wuse",
+      "description": "The unofficial foreign exchange capital of Nigeria. Clustered around the Sheraton intersection, mallams with calculator apps and stacks of USD, GBP, and EUR banknotes execute split-second parallel market currency trades.",
+      "culturalPerk": {
+        "type": "FX_ARBITRAGE_LIQUIDITY",
+        "description": "Unlocks parallel market currency conversion, bypassing banking delays; cash payout multiplier 1.15x for hard currency trades.",
+        "cashMultiplier": 1.15,
+        "socialCapitalDelta": 10
+      },
+      "tags": ["bdc", "forex", "black_market", "sheraton", "wuse_zone_4", "cash"]
+    }
+  ]
+}

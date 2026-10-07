@@ -8,10 +8,28 @@
 // Intent messages (Client → Server)
 // ---------------------------------------------------------------------------
 
+export type SpatialCoord = {
+  x: number;
+  y: number;
+  lat?: number;
+  lng?: number;
+};
+
+export type PathWaypoint = {
+  x: number;
+  y: number;
+  lat?: number;
+  lng?: number;
+  speed?: number;
+  roadCategory?: "expressway" | "arterial" | "street" | "close";
+};
+
 export type MoveIntent = {
   type: "MOVE";
   toX: number;
   toY: number;
+  lat?: number;
+  lng?: number;
 };
 
 export type BuyIntent = {
@@ -54,6 +72,8 @@ export type TransitIntent = {
   toX: number;
   toY: number;
   toDistrictId?: string;
+  toLat?: number;
+  toLng?: number;
 };
 
 export type ClientIntent =
@@ -72,6 +92,14 @@ export type ClientIntent =
 export type ServerAck = {
   type: "ACK";
   idemKey: string;
+  x?: number;
+  y?: number;
+  lat?: number;
+  lng?: number;
+  seq?: number;
+  balanceKobo?: number;
+  pathWaypoints?: PathWaypoint[];
+  transitTier?: TransitTier;
 };
 
 export type ServerError = {

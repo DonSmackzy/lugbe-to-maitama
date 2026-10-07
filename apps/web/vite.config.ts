@@ -18,6 +18,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@ltm/protocol": "../../packages/protocol/src/index.ts",
+      "@ltm/city-schema": "../../packages/city-schema/src/index.ts",
+      "@ltm/engine": "../../packages/engine/src/index.ts",
     },
   },
 });

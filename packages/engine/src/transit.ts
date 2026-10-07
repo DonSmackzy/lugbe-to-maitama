@@ -240,6 +240,15 @@ export function resolveTransit(
     }
   }
 
+  // 7.5 Calculate exact road path along Abuja road network
+  const roadPath = world.navGrid.findRoadPath(
+    actor.position,
+    { x: intent.toX, y: intent.toY },
+    { transitTier: intent.tier }
+  );
+
+  const destGeo = world.navGrid.gridToGeo({ x: intent.toX, y: intent.toY });
+
   // 8. Generate atomic effects
   const effects: Effect[] = [
     {
@@ -254,6 +263,10 @@ export function resolveTransit(
       toX: intent.toX,
       toY: intent.toY,
       enteredZoneId: destinationZone?.id ?? null,
+      transitTier: intent.tier,
+      pathWaypoints: roadPath?.waypoints,
+      lat: destGeo.lat,
+      lng: destGeo.lng,
     },
   ];
 

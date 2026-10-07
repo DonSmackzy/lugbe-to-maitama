@@ -3,8 +3,20 @@
 // Pure logic. Zero I/O.
 // =============================================================================
 
-import type { Coord, Zone } from "@ltm/city-schema";
+import type { Coord, Zone, GeoCoord } from "@ltm/city-schema";
 import type { ErrorCode } from "./effects.js";
+import {
+  geoToGrid,
+  geoToGridContinuous,
+  gridToGeo,
+  ABUJA_GEO_BOUNDS,
+  type GeoBounds,
+} from "./gis/projection.js";
+import {
+  RoadNetworkGraph,
+  type PathfindingResult,
+  getDefaultAbujaRoadGraph,
+} from "./gis/road-network.js";
 
 export type DistrictTier = "satellite" | "midtown" | "core" | "restricted" | "apex";
 
@@ -32,15 +44,19 @@ export class NavGrid {
   private readonly zoneList: Zone[];
   private readonly districtList: District[];
   private readonly zoneToDistrictMap = new Map<string, District>();
+  public roadNetwork: RoadNetworkGraph | undefined;
+  public geoBounds: GeoBounds = ABUJA_GEO_BOUNDS;
 
   constructor(
     public readonly width: number,
     public readonly height: number,
     zones: Zone[] = [],
-    districts: District[] = []
+    districts: District[] = [],
+    roadNetwork?: RoadNetworkGraph
   ) {
     this.zoneList = zones;
     this.districtList = districts;
+    this.roadNetwork = roadNetwork;
 
     // Index districts by zone
     for (const district of districts) {
@@ -137,5 +153,69 @@ export class NavGrid {
       enteredZoneId: zone?.id ?? null,
       enteredDistrictId: district?.id ?? null,
     };
+  }
+
+  // ---------------------------------------------------------------------------
+  // GIS Coordinate Projection & Road Routing
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Projects WGS84 geographic coordinate to integer grid Coord.
+   */
+  geoToGrid(geo: GeoCoord): Coord {
+    return geoToGrid(geo, this.geoBounds, {
+      gridWidth: this.width,
+      gridHeight: this.height,
+    });
+  }
+
+  /**
+   * Projects WGS84 geographic coordinate to continuous sub-tile grid coordinate.
+   */
+  geoToGridContinuous(geo: GeoCoord): { x: number; y: number } {
+    return geoToGridContinuous(geo, this.geoBounds, {
+      gridWidth: this.width,
+      gridHeight: this.height,
+    });
+  }
+
+  /**
+   * Unprojects grid coordinate back to WGS84 GeoCoord.
+   */
+  gridToGeo(grid: { x: number; y: number }): GeoCoord {
+    return gridToGeo(grid, this.geoBounds, {
+      gridWidth: this.width,
+      gridHeight: this.height,
+    });
+  }
+
+  /**
+   * Sets or updates the underlying road network graph.
+   */
+  setRoadNetwork(roadNetwork: RoadNetworkGraph): void {
+    this.roadNetwork = roadNetwork;
+  }
+
+  /**
+   * Gets or initializes the default road network graph.
+   */
+  getRoadNetwork(): RoadNetworkGraph {
+    if (!this.roadNetwork) {
+      this.roadNetwork = getDefaultAbujaRoadGraph();
+    }
+    return this.roadNetwork;
+  }
+
+  /**
+   * Finds road path along real OSM highway edges between two coordinates.
+   * Snaps origin and destination to the nearest road vertices and traces
+   * exact road curvature, respecting one-way roads and roundabouts.
+   */
+  findRoadPath(
+    origin: { x: number; y: number } | GeoCoord,
+    destination: { x: number; y: number } | GeoCoord,
+    options?: { minimizeBy?: "time" | "distance"; transitTier?: "ALONG" | "BOLT" }
+  ): PathfindingResult {
+    return this.getRoadNetwork().findPath(origin, destination, options);
   }
 }

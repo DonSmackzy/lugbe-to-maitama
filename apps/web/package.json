@@ -12,6 +12,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@ltm/city-schema": "workspace:*",
+    "@ltm/engine": "workspace:*",
     "@ltm/protocol": "workspace:*",
     "colyseus.js": "^0.16.22",
     "phaser": "^3.88.0"

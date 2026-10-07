@@ -51,3 +51,53 @@ export {
   APEX_RESTRICTED_DISTRICT_IDS,
 } from "./transit.js";
 export type { TransitAvailabilityResult } from "./transit.js";
+
+// GIS Data Ingestion, Projection & Road Network Routing
+export {
+  ABUJA_GEO_BOUNDS,
+  DEFAULT_GRID_DIMENSIONS,
+  geoToGrid,
+  geoToGridContinuous,
+  gridToGeo,
+  calculateHaversineDistance,
+  gridToIsometricScreen,
+  geoToIsometricScreen,
+  interpolateWaypoints,
+  type GeoBounds,
+  type GridDimensions,
+} from "./gis/projection.js";
+
+export {
+  HIGHWAY_SPECS,
+  classifyHighwayTag,
+  isOneWayHighway,
+  parseOSMGeoJson,
+  type HighwayCategory,
+  type HighwayCategorySpec,
+  type RoadPoint,
+  type ParsedRoadFeature,
+  type ParsedWaterBody,
+  type ParsedRoundabout,
+  type ParsedGISData,
+} from "./gis/osm-parser.js";
+
+export {
+  RoadNetworkGraph,
+  getDefaultAbujaRoadGraph,
+  type RoadNode,
+  type RoadEdge,
+  type PathfindingWaypoint,
+  type PathfindingResult,
+} from "./gis/road-network.js";
+
+export {
+  ABUJA_OSM_GEOJSON,
+} from "./gis/abuja-osm-data.js";
+
+export {
+  ABUJA_CULTURE_OVERLAY,
+  getCulturePOIById,
+  getCulturePOIsByDistrict,
+} from "./gis/culture-overlay.js";
+
+
