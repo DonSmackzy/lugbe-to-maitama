@@ -1,0 +1,43 @@
+# Dependencies (installed fresh inside the container)
+node_modules
+**/node_modules
+
+# Build outputs (rebuilt inside the container)
+**/dist
+**/.turbo
+
+# Version control
+.git
+.gitignore
+
+# IDE & OS
+.vscode
+.idea
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+
+# Environment files (secrets should be injected at runtime)
+.env
+.env.*
+!.env.example
+
+# Documentation & config not needed at build time
+README.md
+*.md
+LICENSE
+
+# Other Dockerfiles & docker-compose
+Dockerfile.*
+docker-compose*.yml
+
+# Test files
+**/*.spec.ts
+**/*.test.ts
+**/test/
+**/coverage/
+
+# Gemini / agent artifacts
+.gemini
+.agents

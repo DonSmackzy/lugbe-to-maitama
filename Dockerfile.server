@@ -11,29 +11,48 @@ RUN corepack enable && corepack prepare pnpm@9.15.2 --activate
 FROM base AS builder
 WORKDIR /app
 
-# Monorepo configuration and lockfile
+# 1. Copy root workspace config files first (best Docker layer caching)
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.base.json ./
-COPY packages/ ./packages/
+
+# 2. Copy every workspace package.json so pnpm can resolve the dependency graph
+#    before copying source (maximises cache reuse on dependency-only changes)
+COPY packages/protocol/package.json   ./packages/protocol/package.json
+COPY packages/city-schema/package.json ./packages/city-schema/package.json
+COPY packages/db/package.json         ./packages/db/package.json
+COPY packages/engine/package.json     ./packages/engine/package.json
+COPY city-packs/abuja/package.json    ./city-packs/abuja/package.json
+COPY apps/server/package.json         ./apps/server/package.json
+
+# 3. Install ALL dependencies (including devDependencies for build tooling)
+RUN pnpm install --frozen-lockfile
+
+# 4. Copy full source for every package the server depends on
+COPY packages/  ./packages/
 COPY city-packs/ ./city-packs/
 COPY apps/server/ ./apps/server/
 
-# Install dependencies and build server
-RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @ltm/server build
+# 5. Build the entire dependency graph via Turbo
+#    turbo.json has "dependsOn": ["^build"], so this compiles:
+#    @ltm/protocol → @ltm/city-schema → @ltm/db → @ltm/engine → @ltm/server
+RUN pnpm turbo run build --filter=@ltm/server...
 
 # --- Stage 2: Production Runner ---
-FROM node:20-alpine AS runner
+FROM base AS runner
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@9.15.2 --activate
 ENV NODE_ENV=production
 
-# Copy built packages and runtime dependencies
-COPY --from=builder /app/package.json ./package.json
+# 1. Copy workspace config + lockfile (needed for pnpm workspace resolution)
+COPY --from=builder /app/package.json      ./package.json
 COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/city-packs ./city-packs
-COPY --from=builder /app/apps/server ./apps/server
+COPY --from=builder /app/pnpm-lock.yaml    ./pnpm-lock.yaml
+
+# 2. Copy built packages (source + dist/ output)
+COPY --from=builder /app/packages/   ./packages/
+COPY --from=builder /app/city-packs/ ./city-packs/
+COPY --from=builder /app/apps/server/ ./apps/server/
+
+# 3. Install production-only dependencies (no devDependencies)
+RUN pnpm install --frozen-lockfile --prod
 
 WORKDIR /app/apps/server
 EXPOSE 2567
