@@ -30,6 +30,18 @@
       "require": "./dist/rules/*.js",
       "default": "./dist/rules/*.js"
     },
+    "./gis": {
+      "types": "./dist/gis/index.d.ts",
+      "import": "./dist/gis/index.js",
+      "require": "./dist/gis/index.js",
+      "default": "./dist/gis/index.js"
+    },
+    "./gis/*": {
+      "types": "./dist/gis/*.d.ts",
+      "import": "./dist/gis/*.js",
+      "require": "./dist/gis/*.js",
+      "default": "./dist/gis/*.js"
+    },
     "./package.json": "./package.json",
     "./dist/*": {
       "types": "./dist/*",

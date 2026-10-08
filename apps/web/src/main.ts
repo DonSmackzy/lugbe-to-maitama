@@ -9,10 +9,14 @@
 
 import "./style.css";
 import Phaser from "phaser";
+import { initGlobalErrorBoundary } from "./ui/ErrorHandler.js";
 import { renderSplashScreen } from "./ui/SplashScreen.js";
 import { ColyseusGameClient } from "./network/ColyseusClient.js";
 import { GameHUD } from "./ui/GameHUD.js";
 import { MainScene } from "./game/MainScene.js";
+
+// Initialize Global Error Boundary immediately to intercept uncaught exceptions & rejections
+initGlobalErrorBoundary();
 
 const appContainer = document.getElementById("app");
 if (!appContainer) {
