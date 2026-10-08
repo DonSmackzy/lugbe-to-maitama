@@ -1,4 +1,8 @@
 import { defineConfig } from "vite";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   server: {
@@ -13,6 +17,9 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    exclude: ["@ltm/engine", "@ltm/city-schema", "@ltm/protocol"],
+  },
   build: {
     target: "es2020",
     outDir: "dist",
@@ -20,9 +27,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@ltm/protocol": "../../packages/protocol/src/index.ts",
-      "@ltm/city-schema": "../../packages/city-schema/src/index.ts",
-      "@ltm/engine": "../../packages/engine/src/index.ts",
+      "@ltm/protocol": path.resolve(__dirname, "../../packages/protocol/src/index.ts"),
+      "@ltm/city-schema": path.resolve(__dirname, "../../packages/city-schema/src/index.ts"),
+      "@ltm/engine": path.resolve(__dirname, "../../packages/engine/src/index.ts"),
     },
   },
 });
