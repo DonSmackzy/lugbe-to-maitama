@@ -52,29 +52,29 @@ export class GeoJsonMapRenderer {
   }
 
   private createLayers(): void {
-    // 1. Water layer (rendered below roads)
+    // 1. Water layer (rendered at base depth 0)
     this.waterGraphics = this.scene.add.graphics();
-    this.waterGraphics.setDepth(1);
+    this.waterGraphics.setDepth(0);
 
-    // 2. Road asphalt base layer
+    // 2. Road asphalt base layer (rendered at base depth 0)
     this.roadBaseGraphics = this.scene.add.graphics();
-    this.roadBaseGraphics.setDepth(2);
+    this.roadBaseGraphics.setDepth(0);
 
-    // 3. Road markings & centerline glow layer
+    // 3. Road markings & centerline glow layer (rendered at base depth 0)
     this.roadMarkingGraphics = this.scene.add.graphics();
-    this.roadMarkingGraphics.setDepth(3);
+    this.roadMarkingGraphics.setDepth(0);
 
-    // 4. Roundabout structures
+    // 4. Roundabout structures (rendered at base depth 0)
     this.roundaboutGraphics = this.scene.add.graphics();
-    this.roundaboutGraphics.setDepth(4);
+    this.roundaboutGraphics.setDepth(0);
 
-    // 5. Culture POI overlays & interactive pins
+    // 5. Culture POI overlays & interactive pins (rendered below player sprites)
     this.poiContainer = this.scene.add.container(0, 0);
-    this.poiContainer.setDepth(10);
+    this.poiContainer.setDepth(5);
 
-    // 6. Active transit vehicles
+    // 6. Active transit vehicles (rendered below player sprites)
     this.transitVehicleContainer = this.scene.add.container(0, 0);
-    this.transitVehicleContainer.setDepth(15);
+    this.transitVehicleContainer.setDepth(8);
 
     // Render all real-world geometry
     this.renderWaterBodies();
@@ -125,7 +125,7 @@ export class GeoJsonMapRenderer {
         }
       );
       label.setOrigin(0.5);
-      label.setDepth(5);
+      label.setDepth(1);
     }
   }
 
@@ -230,7 +230,7 @@ export class GeoJsonMapRenderer {
         padding: { x: 5, y: 3 },
       });
       rbLabel.setOrigin(0.5);
-      rbLabel.setDepth(6);
+      rbLabel.setDepth(2);
     }
   }
 

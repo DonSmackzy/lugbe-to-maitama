@@ -18,6 +18,7 @@ import {
 } from "./IsometricMath.js";
 import { PredictionManager, type MoveIntentPayload } from "./PredictionManager.js";
 import { GeoJsonMapRenderer } from "./GeoJsonMapRenderer.js";
+import { geoToGrid, DEFAULT_GRID_DIMENSIONS } from "@ltm/engine";
 import type { CulturePOI } from "@ltm/city-schema";
 import type { ColyseusGameClient } from "../network/ColyseusClient.js";
 import type { GameHUD } from "../ui/GameHUD.js";
@@ -29,16 +30,19 @@ export interface SceneInitData {
   username: string;
 }
 
-interface Landmark {
-  id: string;
-  name: string;
-  gridX: number;
-  gridY: number;
-  widthTiles: number;
-  heightTiles: number;
-  color: number;
-  label: string;
-}
+/**
+ * Authentic WGS84 GPS spawn locations for major Abuja districts along the road network.
+ */
+export const DISTRICT_SPAWN_GEO: Record<string, { lat: number; lng: number }> = {
+  lugbe: { lat: 8.9650, lng: 7.3680 }, // Lugbe FHA along Airport Road (Grid: 16, 105)
+  wuse: { lat: 9.0620, lng: 7.4680 }, // Berger Roundabout (Grid: 73, 50)
+  garki: { lat: 9.0265, lng: 7.4720 }, // Area 1 / Federal Secretariat (Grid: 75, 70)
+  gwarinpa: { lat: 9.1080, lng: 7.4120 }, // Gwarinpa 3rd Avenue (Grid: 41, 24)
+  maitama: { lat: 9.0880, lng: 7.4980 }, // Maitama Diplomatic Zone (Grid: 90, 35)
+  the_villa: { lat: 9.0560, lng: 7.5400 }, // Aso Rock Presidential Villa (Grid: 113, 53)
+  karu: { lat: 8.9950, lng: 7.5300 }, // Karu / Nyanya corridor
+  central_market: { lat: 9.0550, lng: 7.4580 }, // Central Market Area
+};
 
 export class MainScene extends Phaser.Scene {
   private colyseusClient!: ColyseusGameClient;
@@ -50,7 +54,6 @@ export class MainScene extends Phaser.Scene {
   private playerSprite!: Phaser.GameObjects.Container;
   private otherPlayerSprites: Map<string, Phaser.GameObjects.Container> = new Map();
   private npcSprites: Map<string, Phaser.GameObjects.Container> = new Map();
-  private landmarkSprites: Phaser.GameObjects.Container[] = [];
   private geoMapRenderer!: GeoJsonMapRenderer;
 
   // Input keys
@@ -75,18 +78,11 @@ export class MainScene extends Phaser.Scene {
     this.username = data.username || "Citizen";
     this.startingDistrict = data.startingDistrict || "lugbe";
 
-    // Set starting grid coordinates based on district
-    let startX = 10;
-    let startY = 10;
-    if (this.startingDistrict === "karu") {
-      startX = 20;
-      startY = 95;
-    } else if (this.startingDistrict === "gwarinpa") {
-      startX = 15;
-      startY = 45;
-    }
+    // Project real-world WGS84 coordinates to game grid
+    const targetGeo = DISTRICT_SPAWN_GEO[this.startingDistrict] ?? DISTRICT_SPAWN_GEO.lugbe!;
+    const startGrid = geoToGrid(targetGeo);
 
-    this.predictionManager = new PredictionManager(startX, startY);
+    this.predictionManager = new PredictionManager(startGrid.x, startGrid.y);
   }
 
   preload(): void {
@@ -103,14 +99,14 @@ export class MainScene extends Phaser.Scene {
   create(): void {
     this.createProceduralTextures();
 
-    // 1. Build Isometric Tilemap
+    // 1. Build Isometric Tilemap (render at base depth 0)
     try {
       const map = this.make.tilemap({ key: "abuja_map" });
       const tileset = map.addTilesetImage("abuja_tiles", "abuja_tileset");
       if (tileset) {
         this.groundLayer = map.createLayer("Ground", tileset, 0, 0);
         if (this.groundLayer) {
-          // Camera culling for map tiles
+          this.groundLayer.setDepth(0);
           this.groundLayer.setCullPadding(4, 4);
         }
       }
@@ -118,19 +114,16 @@ export class MainScene extends Phaser.Scene {
       console.warn("[scene] Tilemap load fallback active:", e);
     }
 
-    // 2. Spawn Real-World GIS GeoJSON Map (Roads, Jabi Lake, Roundabouts, Cultural POIs)
+    // 2. Spawn Real-World GIS GeoJSON Map (Roads, Jabi Lake, Roundabouts, Cultural POIs at depth 0)
     this.geoMapRenderer = new GeoJsonMapRenderer({
       scene: this,
       onPOIClick: (poi) => this.handlePOIClick(poi),
     });
 
-    // 3. Spawn Landmark Structures with Strict Y-Sorting
-    this.spawnLandmarks();
-
-    // 4. Spawn NPCs
+    // 3. Spawn NPCs directly aligned on the GIS road network (depth >= 10)
     this.spawnNPCs();
 
-    // 4. Create Local Player Avatar Container
+    // 4. Create Local Player Avatar Container (Strict Z-Indexing: depth >= 10)
     const startScreen = gridToScreen(
       this.predictionManager.predictedX,
       this.predictionManager.predictedY
@@ -146,11 +139,34 @@ export class MainScene extends Phaser.Scene {
       calculateDepth(
         this.predictionManager.predictedX,
         this.predictionManager.predictedY,
-        0.5
+        10
       )
     );
 
-    // 5. Setup Camera
+    // 5. Setup Camera & Laterite Earth Environment (#8B5A2B)
+    this.cameras.main.setBackgroundColor("#8B5A2B");
+
+    // Calculate Cartesian pixel bounds from the projection
+    const pTop = gridToScreen(0, 0);
+    const pRight = gridToScreen(DEFAULT_GRID_DIMENSIONS.gridWidth - 1, 0);
+    const pLeft = gridToScreen(0, DEFAULT_GRID_DIMENSIONS.gridHeight - 1);
+    const pBottom = gridToScreen(
+      DEFAULT_GRID_DIMENSIONS.gridWidth - 1,
+      DEFAULT_GRID_DIMENSIONS.gridHeight - 1
+    );
+
+    const minPixelX = Math.min(pTop.x, pRight.x, pLeft.x, pBottom.x);
+    const maxPixelX = Math.max(pTop.x, pRight.x, pLeft.x, pBottom.x);
+    const minPixelY = Math.min(pTop.y, pRight.y, pLeft.y, pBottom.y);
+    const maxPixelY = Math.max(pTop.y, pRight.y, pLeft.y, pBottom.y);
+
+    const camPadding = 600;
+    const boundsX = minPixelX - camPadding;
+    const boundsY = minPixelY - camPadding;
+    const boundsWidth = maxPixelX - minPixelX + camPadding * 2;
+    const boundsHeight = maxPixelY - minPixelY + camPadding * 2;
+
+    this.cameras.main.setBounds(boundsX, boundsY, boundsWidth, boundsHeight);
     this.cameras.main.startFollow(this.playerSprite, true, 0.1, 0.1);
     this.cameras.main.setZoom(1.1);
 
@@ -194,7 +210,7 @@ export class MainScene extends Phaser.Scene {
         const scr = gridToScreen(reconciled.x, reconciled.y);
         this.playerSprite.setPosition(scr.x, scr.y);
         this.playerSprite.setDepth(
-          calculateDepth(reconciled.x, reconciled.y, 0.5)
+          calculateDepth(reconciled.x, reconciled.y, 10)
         );
       }
 
@@ -241,7 +257,10 @@ export class MainScene extends Phaser.Scene {
       room.state.players.onAdd((player: any, key: string) => {
         if (key === room.sessionId) return; // Ignore local player
 
-        const scr = gridToScreen(player.x || 10, player.y || 10);
+        const initialGrid = (player.lat !== undefined && player.lng !== undefined)
+          ? geoToGrid({ lat: player.lat, lng: player.lng })
+          : { x: player.x || 16, y: player.y || 105 };
+        const scr = gridToScreen(initialGrid.x, initialGrid.y);
         const remoteAvatar = this.createAvatar(
           scr.x,
           scr.y,
@@ -249,11 +268,14 @@ export class MainScene extends Phaser.Scene {
           0x38bdf8,
           false
         );
-        remoteAvatar.setDepth(calculateDepth(player.x || 10, player.y || 10, 0.5));
+        remoteAvatar.setDepth(calculateDepth(initialGrid.x, initialGrid.y, 10));
         this.otherPlayerSprites.set(key, remoteAvatar);
 
         player.onChange(() => {
-          const targetScr = gridToScreen(player.x, player.y);
+          const currentGrid = (player.lat !== undefined && player.lng !== undefined)
+            ? geoToGrid({ lat: player.lat, lng: player.lng })
+            : { x: player.x || 16, y: player.y || 105 };
+          const targetScr = gridToScreen(currentGrid.x, currentGrid.y);
           this.tweens.add({
             targets: remoteAvatar,
             x: targetScr.x,
@@ -261,7 +283,7 @@ export class MainScene extends Phaser.Scene {
             duration: 100,
             ease: "Linear",
           });
-          remoteAvatar.setDepth(calculateDepth(player.x, player.y, 0.5));
+          remoteAvatar.setDepth(calculateDepth(currentGrid.x, currentGrid.y, 10));
         });
       });
 
@@ -336,16 +358,6 @@ export class MainScene extends Phaser.Scene {
         sprite.y <= bounds.y + bounds.height + padding;
       sprite.setVisible(isVisible);
     }
-
-    // Cull landmark structures
-    for (const structure of this.landmarkSprites) {
-      const isVisible =
-        structure.x >= bounds.x - padding &&
-        structure.x <= bounds.x + bounds.width + padding &&
-        structure.y >= bounds.y - padding &&
-        structure.y <= bounds.y + bounds.height + padding;
-      structure.setVisible(isVisible);
-    }
   }
 
   /**
@@ -368,12 +380,12 @@ export class MainScene extends Phaser.Scene {
     );
     this.playerSprite.setPosition(screenPos.x, screenPos.y);
 
-    // STRICT Y-SORTING: Depth = gridX + gridY
+    // STRICT Z-INDEXING: Depth >= 10
     this.playerSprite.setDepth(
       calculateDepth(
         this.predictionManager.predictedX,
         this.predictionManager.predictedY,
-        0.5
+        10
       )
     );
 
@@ -442,145 +454,37 @@ export class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Spawns landmark 2.5D isometric structures with strict Y-Sorting.
-   */
-  private spawnLandmarks(): void {
-    const landmarks: Landmark[] = [
-      {
-        id: "lugbe_gate",
-        name: "Lugbe Airport Rd Junction",
-        gridX: 12,
-        gridY: 12,
-        widthTiles: 2,
-        heightTiles: 2,
-        color: 0xb45309,
-        label: "LUGBE PARK",
-      },
-      {
-        id: "wuse_market_hall",
-        name: "Wuse Central Market",
-        gridX: 45,
-        gridY: 15,
-        widthTiles: 4,
-        heightTiles: 3,
-        color: 0x475569,
-        label: "WUSE MARKET",
-      },
-      {
-        id: "garki_secretariat",
-        name: "Federal Secretariat",
-        gridX: 75,
-        gridY: 15,
-        widthTiles: 4,
-        heightTiles: 4,
-        color: 0x334155,
-        label: "FEDERAL SECRETARIAT",
-      },
-      {
-        id: "maitama_mansion",
-        name: "Maitama Diplomatic Quarters",
-        gridX: 75,
-        gridY: 75,
-        widthTiles: 5,
-        heightTiles: 4,
-        color: 0x065f46,
-        label: "EMBASSY ROW",
-      },
-      {
-        id: "the_villa_gatehouse",
-        name: "Aso Rock Presidential Villa",
-        gridX: 100,
-        gridY: 100,
-        widthTiles: 6,
-        heightTiles: 6,
-        color: 0x1e293b,
-        label: "THE VILLA (APEX)",
-      },
-    ];
-
-    for (const lm of landmarks) {
-      const scr = gridToScreen(lm.gridX, lm.gridY);
-      const container = this.add.container(scr.x, scr.y);
-
-      // Isometric building block
-      const gfx = this.add.graphics();
-      gfx.fillStyle(lm.color, 0.9);
-      // Isometric roof polygon
-      gfx.fillPoints([
-        new Phaser.Geom.Point(0, -60),
-        new Phaser.Geom.Point(40, -40),
-        new Phaser.Geom.Point(0, -20),
-        new Phaser.Geom.Point(-40, -40),
-      ]);
-
-      // Building wall facets
-      gfx.fillStyle(Phaser.Display.Color.IntegerToColor(lm.color).darken(20).color, 1);
-      gfx.fillPoints([
-        new Phaser.Geom.Point(-40, -40),
-        new Phaser.Geom.Point(0, -20),
-        new Phaser.Geom.Point(0, 10),
-        new Phaser.Geom.Point(-40, -10),
-      ]);
-
-      gfx.fillStyle(Phaser.Display.Color.IntegerToColor(lm.color).darken(40).color, 1);
-      gfx.fillPoints([
-        new Phaser.Geom.Point(0, -20),
-        new Phaser.Geom.Point(40, -40),
-        new Phaser.Geom.Point(40, -10),
-        new Phaser.Geom.Point(0, 10),
-      ]);
-
-      const labelText = this.add.text(0, -75, lm.label, {
-        fontFamily: "system-ui, sans-serif",
-        fontSize: "11px",
-        fontStyle: "bold",
-        color: "#fbbf24",
-        stroke: "#000000",
-        strokeThickness: 3,
-      });
-      labelText.setOrigin(0.5);
-
-      container.add([gfx, labelText]);
-
-      // STRICT Y-SORTING: Building depth matches its base grid coordinate
-      container.setDepth(calculateDepth(lm.gridX, lm.gridY, 0));
-      this.landmarkSprites.push(container);
-    }
-  }
-
-  /**
-   * Spawns canonical NPCs: Along Driver, Civil Servant, and The President.
+   * Spawns canonical NPCs: Along Driver, Civil Servant, and The President
+   * accurately aligned with the Abuja road network via GIS projection.
    */
   private spawnNPCs(): void {
     const npcs = [
       {
         id: "alhaji_tanko",
         name: "Alhaji Tanko (Along Driver)",
-        gridX: 14,
-        gridY: 10,
+        geo: { lat: 8.9650, lng: 7.3680 }, // Lugbe FHA on Airport Road (Grid: 16, 105)
         color: 0xf59e0b,
         archetype: "along_driver",
       },
       {
         id: "director_yusuf",
         name: "Director Yusuf (Civil Servant)",
-        gridX: 72,
-        gridY: 18,
+        geo: { lat: 9.0265, lng: 7.4720 }, // Federal Secretariat / Garki (Grid: 75, 70)
         color: 0x64748b,
         archetype: "civil_servant",
       },
       {
         id: "the_president",
         name: "The President (Head of State)",
-        gridX: 102,
-        gridY: 102,
+        geo: { lat: 9.0560, lng: 7.5400 }, // Aso Rock Presidential Villa (Grid: 113, 53)
         color: 0xd97706,
         archetype: "head_of_state",
       },
     ];
 
     for (const npc of npcs) {
-      const scr = gridToScreen(npc.gridX, npc.gridY);
+      const grid = geoToGrid(npc.geo);
+      const scr = gridToScreen(grid.x, grid.y);
       const avatar = this.createAvatar(
         scr.x,
         scr.y,
@@ -596,7 +500,8 @@ export class MainScene extends Phaser.Scene {
         this.talkToNPC(npc.id, npc.name, npc.archetype);
       });
 
-      avatar.setDepth(calculateDepth(npc.gridX, npc.gridY, 0.4));
+      // Strict Z-Indexing: NPC sprites render at depth >= 10
+      avatar.setDepth(calculateDepth(grid.x, grid.y, 10));
       this.npcSprites.set(npc.id, avatar);
     }
   }
@@ -669,12 +574,13 @@ export class MainScene extends Phaser.Scene {
   }
 
   private getDistrictAt(x: number, y: number): string {
-    if (x >= 90 && y >= 90) return "the_villa";
-    if (x >= 60 && y >= 60) return "maitama";
-    if (x >= 60 && y < 30) return "garki";
-    if (x >= 30 && x < 60 && y < 60) return "wuse";
-    if (x < 30 && y < 30) return "lugbe";
-    if (y >= 90 && x < 60) return "karu";
+    if (x >= 100 && y <= 65) return "the_villa";
+    if (x >= 75 && y <= 45) return "maitama";
+    if (x >= 60 && y >= 65) return "garki";
+    if (x >= 60 && x < 90 && y >= 40 && y < 65) return "wuse";
+    if (x <= 35 && y >= 70) return "lugbe";
+    if (x < 60 && y < 45) return "gwarinpa";
+    if (x >= 90 && y >= 70) return "karu";
     return "central_market";
   }
 
